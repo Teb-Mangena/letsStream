@@ -40,8 +40,7 @@ export async function signup(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const idx = Math.floor(Math.random() * 100) + 1; // generate a num between 1-100
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    const randomAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`;
 
     // create user in the DB
     const user = await User.create({
