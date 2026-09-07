@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import { ENV } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 
+import authRoutes from "./routes/auth.route.js";
+
 const app = express();
 const { PORT } = ENV;
 
@@ -19,6 +21,9 @@ app.use(morgan("dev"));
 app.get("/", (req, res) => {
   res.send("App running!!");
 });
+
+// API Routes
+app.use("/api/auth", authRoutes);
 
 // Connect DB and listen to port
 connectDB().then(() => {

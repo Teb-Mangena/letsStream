@@ -6,4 +6,6 @@ export const ENV = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   FRONTEND_URL: process.env.FRONTEND_URL,
+  STEAM_API_KEY: process.env.STEAM_API_KEY,
+  STEAM_API_SECRET: process.env.STEAM_API_SECRET,
 };
