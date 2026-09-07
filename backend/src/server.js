@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
 import { ENV } from "./config/env.js";
+import { connectDB } from "./config/db.js";
 
 const app = express();
 const { PORT } = ENV;
@@ -20,6 +21,8 @@ app.get("/", (req, res) => {
 });
 
 // Connect DB and listen to port
-app.listen(PORT, () => {
-  console.log(`Listening on PORT: ${PORT}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Listening on PORT: ${PORT}`);
+  });
 });
