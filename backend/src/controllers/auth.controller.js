@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import User from "../models/User.js";
 import { generateToken } from "../config/generateToken.js";
+import { upsertStreamUser } from "../lib/stream.js";
 
 export async function signup(req, res) {
   const { fullName, email, password } = req.body;
@@ -50,7 +51,17 @@ export async function signup(req, res) {
       profilePic: randomAvatar,
     });
 
-    // TODO: create/upsert user into stream
+    try {
+      const streamResponse = await upsertStreamUser({
+        id: user._id.toString(),
+        name: user.fullName,
+        image: user.profilePic,
+      });
+
+      console.log("Stream user created:", streamResponse);
+    } catch (error) {
+      console.log("Error creating Stream user:", error);
+    }
 
     // generate token
     generateToken(user._id, res);
