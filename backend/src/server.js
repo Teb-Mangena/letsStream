@@ -7,6 +7,8 @@ import { ENV } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 
 import authRoutes from "./routes/auth.route.js";
+import userRoutes from "./routes/user.route.js";
+import chatRoutes from "./routes/chat.route.js";
 
 const app = express();
 const { PORT } = ENV;
@@ -24,6 +26,8 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Connect DB and listen to port
 connectDB().then(() => {

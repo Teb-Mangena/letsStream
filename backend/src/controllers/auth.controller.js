@@ -161,7 +161,7 @@ export async function onboard(req, res) {
       userId,
       {
         ...req.body,
-        isOnboarded: true,
+        isBoarded: true,
       },
       { returnDocument: "after" },
     );
