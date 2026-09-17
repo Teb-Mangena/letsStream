@@ -11,10 +11,15 @@ import userRoutes from "./routes/user.route.js";
 import chatRoutes from "./routes/chat.route.js";
 
 const app = express();
-const { PORT } = ENV;
+const { PORT, FRONTEND_URL } = ENV;
 
 // middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("dev"));

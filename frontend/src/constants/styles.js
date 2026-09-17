@@ -1,0 +1,56 @@
+export const GREETINGS = [
+  "こんにちは",
+  "Hola",
+  "Bonjour",
+  "안녕하세요",
+  "Ciao",
+  "مرحبا",
+  "你好",
+  "Olá",
+  "Hallo",
+  "Привет",
+  "नमस्ते",
+  "Γειά σου",
+  "שלום",
+  "Merhaba",
+  "Xin chào",
+  "สวัสดี",
+  "Selamat",
+  "Hej",
+  "Kumusta",
+  "Sawubona",
+  "Molo",
+  "Dumela",
+];
+
+export const LANGUAGES = [
+  // South African official languages (priority)
+  { code: "af", name: "Afrikaans" },
+  { code: "en", name: "English" },
+  { code: "nr", name: "Ndebele (isiNdebele)" },
+  { code: "xh", name: "Xhosa (isiXhosa)" },
+  { code: "zu", name: "Zulu (isiZulu)" },
+  { code: "nso", name: "Northern Sotho / Sepedi" },
+  { code: "st", name: "Southern Sotho / Sesotho" },
+  { code: "tn", name: "Tswana / Setswana" },
+  { code: "ss", name: "Swati / siSwati" },
+  { code: "ve", name: "Venda / Tshivenda" },
+  { code: "ts", name: "Tsonga / Xitsonga" },
+
+  // Other widely used languages in South Africa and the region
+  { code: "sot", name: "Sotho (general)" },
+  { code: "fan", name: "Fanakalo" },
+
+  // Additional international languages
+  { code: "fr", name: "French" },
+  { code: "pt", name: "Portuguese" },
+  { code: "es", name: "Spanish" },
+  { code: "ar", name: "Arabic" },
+  { code: "zh", name: "Chinese (Mandarin)" },
+  { code: "hi", name: "Hindi" },
+  { code: "de", name: "German" },
+  { code: "ru", name: "Russian" },
+  { code: "ja", name: "Japanese" },
+  { code: "it", name: "Italian" },
+  { code: "nl", name: "Dutch" },
+];

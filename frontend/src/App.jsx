@@ -1,9 +1,50 @@
+import { Navigate, Route, Routes } from "react-router"
+import { Toaster } from "react-hot-toast"
+
+import HomePage from "./pages/HomePage"
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage"
+import { useAuth } from "./hooks/useAuth"
+import OnboardingPage from "./pages/OnboardingPage"
 
 function App() {
+  const { checkAuthQuery } = useAuth();
+  const { data: authUser, isLoading } = checkAuthQuery;
+
+  const isAuthenticated = Boolean(authUser);
+  const isBoarded = authUser?.user?.isBoarded;
+
+  if (isLoading) return <p>Loading...</p>
 
   return (
-    <div className="bg-slate-100">
-      <p className="text-2xl font-bold">LetsStream</p>
+    <div className="h-screen" data-theme="dark">
+
+      <Routes>
+        <Route index element={isAuthenticated && isBoarded ? <HomePage /> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />} />
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <LoginPage /> : <Navigate to={isBoarded ? "/" : "/onboarding"} />}
+        />
+        <Route
+          path="/signup"
+          element={!isAuthenticated ? <SignupPage /> : <Navigate to={isBoarded ? "/" : "/onboarding"} />}
+        />
+        <Route
+          path="/onboarding"
+          element={
+            isAuthenticated ? (
+              !isBoarded ? (
+                <OnboardingPage />
+              ) : (
+                <Navigate to="/" />
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+      <Toaster />
     </div>
   )
 }
