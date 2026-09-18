@@ -9,6 +9,8 @@ import OnboardingPage from "./pages/OnboardingPage"
 import Layout from "./components/Layout"
 import NotificationsPage from "./pages/NotificationsPage"
 import ProfilePage from "./pages/ProfilePage"
+import ChatPage from "./pages/ChatPage"
+import CallPage from "./pages/CallPage"
 
 function App() {
   const { checkAuthQuery } = useAuth();
@@ -69,6 +71,28 @@ function App() {
             isAuthenticated && isBoarded ? (
               <Layout showSidebar={true}>
                 <ProfilePage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/call/:id"
+          element={
+            isAuthenticated && isBoarded ? (
+              <CallPage />
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/chat/:id"
+          element={
+            isAuthenticated && isBoarded ? (
+              <Layout showSidebar={false}>
+                <ChatPage />
               </Layout>
             ) : (
               <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
