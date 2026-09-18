@@ -6,6 +6,9 @@ import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import { useAuth } from "./hooks/useAuth"
 import OnboardingPage from "./pages/OnboardingPage"
+import Layout from "./components/Layout"
+import NotificationsPage from "./pages/NotificationsPage"
+import ProfilePage from "./pages/ProfilePage"
 
 function App() {
   const { checkAuthQuery } = useAuth();
@@ -20,7 +23,12 @@ function App() {
     <div className="h-screen" data-theme="dark">
 
       <Routes>
-        <Route index element={isAuthenticated && isBoarded ? <HomePage /> : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />} />
+        <Route index element={isAuthenticated && isBoarded ? (
+          <Layout showSidebar={true}>
+            <HomePage />
+          </Layout>
+
+        ) : <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />} />
         <Route
           path="/login"
           element={!isAuthenticated ? <LoginPage /> : <Navigate to={isBoarded ? "/" : "/onboarding"} />}
@@ -40,6 +48,30 @@ function App() {
               )
             ) : (
               <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            isAuthenticated && isBoarded ? (
+              <Layout showSidebar={true}>
+                <NotificationsPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated && isBoarded ? (
+              <Layout showSidebar={true}>
+                <ProfilePage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
             )
           }
         />

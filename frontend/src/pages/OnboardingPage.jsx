@@ -1,14 +1,10 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router";
-import {
-  ArrowUpRight,
-  Upload,
-  User,
-  X,
-  Check,
-} from "lucide-react";
+import { ArrowUpRight, Upload, User, X, Check } from "lucide-react";
 import { GREETINGS, LANGUAGES } from "../constants/styles";
 import { useAuth } from "../hooks/useAuth";
+
+/* ── Decorative marquee ──────────────────────────── */
 
 function Marquee({ reverse = false }) {
   const items = [...GREETINGS, ...GREETINGS];
@@ -21,10 +17,7 @@ function Marquee({ reverse = false }) {
         }}
       >
         {items.map((g, i) => (
-          <span
-            key={i}
-            className="text-sm font-medium text-white/25 select-none"
-          >
+          <span key={i} className="text-sm font-medium text-white/25 select-none">
             {g}
           </span>
         ))}
@@ -32,6 +25,8 @@ function Marquee({ reverse = false }) {
     </div>
   );
 }
+
+/* ── Form primitives ─────────────────────────────── */
 
 function Field({ label, hint, trailing, ...props }) {
   return (
@@ -55,39 +50,83 @@ function Field({ label, hint, trailing, ...props }) {
   );
 }
 
+function ComboBox({ id, label, accent = false, value, onChange, options }) {
+  return (
+    <div>
+      <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 mb-2.5">
+        {label}
+      </label>
+      <div
+        className={`flex items-center gap-3 rounded-xl px-4 py-3.5 transition-colors ${accent
+            ? "border border-lime-300/30 bg-lime-300/[0.03] focus-within:border-lime-300/70 focus-within:bg-lime-300/[0.06]"
+            : "border border-white/10 bg-white/[0.02] focus-within:border-lime-300/50 focus-within:bg-white/[0.04]"
+          }`}
+      >
+        <input
+          list={id}
+          value={value}
+          onChange={onChange}
+          placeholder="Pick or type…"
+          className={`w-full bg-transparent text-sm outline-none ${accent
+              ? "font-medium text-lime-300 placeholder:text-lime-300/30"
+              : "text-white placeholder:text-white/20"
+            }`}
+        />
+        <datalist id={id}>
+          {options.map((l) => (
+            <option key={l.code} value={l.name} />
+          ))}
+        </datalist>
+        {value && <Check className="size-4 shrink-0 text-lime-300" />}
+      </div>
+    </div>
+  );
+}
+
+/* ── Page ────────────────────────────────────────── */
+
 export default function OnboardingPage() {
-  const [preview, setPreview] = useState(null)
-  const [nativeLang, setNativeLang] = useState("Sepedi");
-  const [learningLang, setLearningLang] = useState("English");
   const fileRef = useRef(null);
+  const [preview, setPreview] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+
   const { checkAuthQuery, onboardingMutation } = useAuth();
   const { mutate: onboardUser, isPending } = onboardingMutation;
-  const { data } = checkAuthQuery;
-  const authUser = data.user;
+  const authUser = checkAuthQuery.data?.user;
 
-  const [userDetails, setUserDetails] = useState({
-    fullName: authUser.fullName || "",
-    bio: authUser.bio || "",
-    nativeLanguage: authUser.nativeLanguage || "",
-    learningLanguage: authUser.learningLanguage || "",
-    location: authUser.location || ""
-  })
+  const [details, setDetails] = useState({
+    fullName: authUser?.fullName ?? "",
+    bio: authUser?.bio ?? "",
+    nativeLanguage: authUser?.nativeLanguage ?? "",
+    learningLanguage: authUser?.learningLanguage ?? "",
+    location: authUser?.location ?? "",
+  });
+
+  const update = (key) => (e) =>
+    setDetails((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (!file) return;
+    setAvatarFile(file);
+    setPreview(URL.createObjectURL(file));
   };
 
   const clearFile = () => {
+    setAvatarFile(null);
     setPreview(null);
     if (fileRef.current) fileRef.current.value = "";
   };
 
   const handleOnboard = (e) => {
     e.preventDefault();
+    onboardUser({
+      ...details,
+      ...(avatarFile && { profilePic: avatarFile }),
+    });
+  };
 
-    onboardUser(userDetails);
-  }
+  const avatarSrc = preview || authUser?.profilePic;
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white flex flex-col overflow-hidden">
@@ -119,9 +158,9 @@ export default function OnboardingPage() {
             {/* Avatar frame */}
             <div className="relative inline-block">
               <div className="size-40 lg:size-48 rounded-3xl border border-white/10 bg-white/[0.02] overflow-hidden grid place-items-center">
-                {authUser?.profilePic ? (
+                {avatarSrc ? (
                   <img
-                    src={authUser.profilePic}
+                    src={avatarSrc}
                     alt="Profile preview"
                     className="size-full object-cover"
                   />
@@ -130,7 +169,6 @@ export default function OnboardingPage() {
                 )}
               </div>
 
-              {/* Upload / clear buttons */}
               <div className="absolute -bottom-3 -right-3 flex gap-2">
                 <button
                   type="button"
@@ -161,7 +199,6 @@ export default function OnboardingPage() {
               />
             </div>
 
-            {/* Headline */}
             <h1 className="mt-10 text-5xl sm:text-6xl xl:text-7xl font-black tracking-tighter leading-[0.85]">
               Show up
               <br />
@@ -198,19 +235,15 @@ export default function OnboardingPage() {
               We'll use this to match you with the right partners.
             </p>
 
-            <form
-              onSubmit={handleOnboard}
-              className="mt-10 space-y-6"
-              noValidate
-            >
+            <form onSubmit={handleOnboard} className="mt-10 space-y-6" noValidate>
               <Field
                 label="Full name"
                 name="fullName"
                 type="text"
                 placeholder="Alex Morgan"
                 autoComplete="name"
-                value={userDetails.fullName}
-                onChange={(e) => setUserDetails({ ...userDetails, fullName: e.target.value })}
+                value={details.fullName}
+                onChange={update("fullName")}
               />
 
               {/* Bio */}
@@ -220,7 +253,7 @@ export default function OnboardingPage() {
                     Bio
                   </label>
                   <span className="font-mono text-[10px] text-white/20">
-                    120 max
+                    {details.bio.length} / 120
                   </span>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3.5 transition-colors focus-within:border-lime-300/50 focus-within:bg-white/[0.04]">
@@ -229,80 +262,47 @@ export default function OnboardingPage() {
                     rows={3}
                     maxLength={120}
                     placeholder="Tell partners what you're into…"
-                    value={userDetails.bio}
-                    onChange={(e) => setUserDetails({ ...userDetails, bio: e.target.value })}
+                    value={details.bio}
+                    onChange={update("bio")}
                     className="w-full resize-none bg-transparent text-sm text-white outline-none placeholder:text-white/20"
                   />
                 </div>
               </div>
 
-              {/* Native language — combo box */}
-              <div>
-                <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 mb-2.5">
-                  Native language
-                </label>
-                <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/2 px-4 py-3.5 transition-colors focus-within:border-lime-300/50 focus-within:bg-white/4">
-                  <input
-                    list="native-langs"
-                    name="nativeLanguage"
-                    value={userDetails.nativeLanguage}
-                    onChange={(e) => setUserDetails({ ...userDetails, nativeLanguage: e.target.value })}
-                    placeholder="Pick or type…"
-                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/20"
-                  />
-                  <datalist id="native-langs">
-                    {LANGUAGES.map((l) => (
-                      <option key={l.code} value={l.name} />
-                    ))}
-                  </datalist>
-                  {nativeLang && (
-                    <Check className="size-4 shrink-0 text-lime-300" />
-                  )}
-                </div>
-              </div>
+              <ComboBox
+                id="native-langs"
+                label="Native language"
+                options={LANGUAGES}
+                value={details.nativeLanguage}
+                onChange={update("nativeLanguage")}
+              />
 
-              {/* Learning language — combo box */}
-              <div>
-                <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 mb-2.5">
-                  Learning language
-                </label>
-                <div className="flex items-center gap-3 rounded-xl border border-lime-300/30 bg-lime-300/[0.03] px-4 py-3.5 transition-colors focus-within:border-lime-300/70 focus-within:bg-lime-300/[0.06]">
-                  <input
-                    list="learning-langs"
-                    name="learningLanguage"
-                    value={userDetails.learningLanguage}
-                    onChange={(e) => setUserDetails({ ...userDetails, learningLanguage: e.target.value })}
-                    placeholder="Pick or type…"
-                    className="w-full bg-transparent text-sm font-medium text-lime-300 outline-none placeholder:text-lime-300/30"
-                  />
-                  <datalist id="learning-langs">
-                    {LANGUAGES.map((l) => (
-                      <option key={l.code} value={l.name} />
-                    ))}
-                  </datalist>
-                  {learningLang && (
-                    <Check className="size-4 shrink-0 text-lime-300" />
-                  )}
-                </div>
-              </div>
+              <ComboBox
+                id="learning-langs"
+                label="Learning language"
+                accent
+                options={LANGUAGES}
+                value={details.learningLanguage}
+                onChange={update("learningLanguage")}
+              />
 
               <Field
                 label="Location"
                 name="location"
                 type="text"
-                value={userDetails.location}
-                onChange={(e) => setUserDetails({ ...userDetails, location: e.target.value })}
                 placeholder="City, Country"
                 autoComplete="country-name"
+                value={details.location}
+                onChange={update("location")}
               />
 
               <button
                 type="submit"
                 disabled={isPending}
-                className="group mt-2 flex w-full items-center justify-between rounded-xl bg-lime-300 px-6 py-4 font-semibold text-neutral-950 transition-colors hover:bg-lime-200"
+                className="group mt-2 flex w-full items-center justify-between rounded-xl bg-lime-300 px-6 py-4 font-semibold text-neutral-950 transition-colors hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-lime-300"
               >
-                <span>{isPending ? "Completing..." : "Complete profile"}</span>
-                <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                <span>{isPending ? "Completing…" : "Complete profile"}</span>
+                <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-disabled:translate-x-0 group-disabled:translate-y-0" />
               </button>
 
               <p className="font-mono text-[10px] leading-relaxed text-white/25">
@@ -313,7 +313,6 @@ export default function OnboardingPage() {
         </section>
       </main>
 
-      {/* bottom marquee */}
       <div className="relative border-t border-white/10">
         <Marquee reverse />
       </div>

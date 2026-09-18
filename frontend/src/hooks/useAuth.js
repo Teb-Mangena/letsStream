@@ -107,7 +107,11 @@ async function logoutUser() {
 }
 
 async function checkAuth() {
-  const res = await axiosInstance.get("/auth/me");
-
-  return res.data;
+  try {
+    const res = await axiosInstance.get("/auth/me");
+    return res.data;
+  } catch (error) {
+    console.log("Error in getAuthUser:", error);
+    return null;
+  }
 }
