@@ -16,6 +16,7 @@ import {
 } from "@stream-io/video-react-sdk";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import toast from "react-hot-toast";
+import PageLoader from "../components/PageLoader";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -72,7 +73,7 @@ function CallPage() {
     initCall();
   }, [tokenData, authUser, callId]);
 
-  if (isLoading || isConnecting) return <p>Loading...</p>;
+  if (isLoading || isConnecting) return <PageLoader />;
 
   return (
     <div className="h-screen flex flex-col items-center justify-center">

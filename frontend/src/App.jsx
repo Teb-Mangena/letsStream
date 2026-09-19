@@ -11,6 +11,7 @@ import NotificationsPage from "./pages/NotificationsPage"
 import ProfilePage from "./pages/ProfilePage"
 import ChatPage from "./pages/ChatPage"
 import CallPage from "./pages/CallPage"
+import PageLoader from "./components/PageLoader"
 
 function App() {
   const { checkAuthQuery } = useAuth();
@@ -19,7 +20,7 @@ function App() {
   const isAuthenticated = Boolean(authUser);
   const isBoarded = authUser?.user?.isBoarded;
 
-  if (isLoading) return <p>Loading...</p>
+  if (isLoading) return <PageLoader />
 
   return (
     <div className="h-screen" data-theme="dark">

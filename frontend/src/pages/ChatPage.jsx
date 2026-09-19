@@ -17,6 +17,7 @@ import {
 import toast from "react-hot-toast";
 import { StreamChat } from "stream-chat";
 import CallButton from "../components/CallButton";
+import PageLoader from "../components/PageLoader";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -91,16 +92,7 @@ function ChatPage() {
     }
   };
 
-  if (isLoading || !chatClient || !channel) {
-    return (
-      <div className="relative min-h-screen bg-neutral-950 text-white flex items-center justify-center gap-3">
-        <span className="size-1.5 rounded-full bg-lime-300 animate-pulse" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
-          Connecting
-        </span>
-      </div>
-    );
-  }
+  if (isLoading || !chatClient || !channel) return <PageLoader />
 
   return (
     <div className="relative h-[calc(100vh-4rem)] bg-neutral-950 text-white overflow-hidden">
