@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getStreamToken } from "../lib/api";
+import { ArrowLeftIcon } from "lucide-react";
 
 import {
   Chat,
@@ -15,6 +16,7 @@ import {
 } from "stream-chat-react";
 import toast from "react-hot-toast";
 import { StreamChat } from "stream-chat";
+import CallButton from "../components/CallButton";
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -26,75 +28,110 @@ function ChatPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const { checkAuthQuery } = useAuth();
-  const { data } = checkAuthQuery
-  const authUser = data.user;
+  const authUser = checkAuthQuery.data?.user;
 
   const { data: tokenData } = useQuery({
-    queryKey: ['streamToken'],
+    queryKey: ["streamToken"],
     queryFn: getStreamToken,
-    enabled: !!authUser
-  })
+    enabled: !!authUser,
+  });
 
   useEffect(() => {
     const initChat = async () => {
       if (!tokenData?.token || !authUser) return;
 
       try {
-        console.log("Initializing stream chat client...");
-
         const client = StreamChat.getInstance(STREAM_API_KEY);
 
         const user = {
           id: authUser._id,
           name: authUser.fullName,
-          image: authUser.profilePic
-        }
+          image: authUser.profilePic,
+        };
 
         await client.connectUser(user, tokenData.token);
 
         const channelId = [authUser._id, targetUserId].sort().join("-");
-
         const currChannel = client.channel("messaging", channelId, {
-          members: [authUser._id, targetUserId]
+          members: [authUser._id, targetUserId],
         });
 
         await currChannel.watch();
 
         setChatClient(client);
         setChannel(currChannel);
-
       } catch (error) {
         console.error("Error initializing chat:", error);
         toast.error("Could not connect to chat. Please try again.");
       } finally {
         setIsLoading(false);
       }
+    };
+
+    initChat();
+
+    return () => {
+      // Clean up Stream client on unmount so switching chats doesn't leak connections
+      if (chatClient) {
+        chatClient.disconnectUser().catch(() => { });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenData, authUser, targetUserId]);
+
+  const handleVideoCall = () => {
+    if (channel) {
+      const callUrl = `${window.location.origin}/call/${channel.id}`;
+
+      channel.sendMessage({
+        text: `I've started a video call. Join me here: ${callUrl}`,
+      });
+
+      toast.success("Video call link sent successfully!");
     }
+  };
 
-    initChat()
-  }, [tokenData, authUser, targetUserId])
-
-  if (isLoading || !chatClient || !channel) return <p>Loading...</p>;
+  if (isLoading || !chatClient || !channel) {
+    return (
+      <div className="relative min-h-screen bg-neutral-950 text-white flex items-center justify-center gap-3">
+        <span className="size-1.5 rounded-full bg-lime-300 animate-pulse" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
+          Connecting
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-[93vh]">
-      <Chat client={chatClient}>
-        <Channel channel={channel}>
-          <div className="w-full relative">
-            {/* <CallButton handleVideoCall={handleVideoCall} /> */}
+    <div className="relative h-[calc(100vh-4rem)] bg-neutral-950 text-white overflow-hidden">
+      {/* grid texture */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.04] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:64px_64px]" />
+
+      {/* back link */}
+      <Link
+        to="/"
+        className="fixed top-20 left-4 z-50 flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/80 px-3 py-2 text-xs font-medium text-white/60 backdrop-blur-md transition-colors hover:border-lime-300/40 hover:text-lime-300 lg:left-72"
+      >
+        <ArrowLeftIcon className="size-3.5" />
+        <span className="hidden sm:inline">Back</span>
+      </Link>
+
+      <div className="relative h-full">
+        <Chat client={chatClient} theme="messaging dark">
+          <Channel channel={channel}>
             <Window>
               <ChannelHeader />
               <MessageList />
               <MessageComposer />
             </Window>
             <Thread />
-          </div>
-          <Thread />
+          </Channel>
+        </Chat>
+      </div>
 
-        </Channel>
-      </Chat>
+      <CallButton handleVideoCall={handleVideoCall} />
     </div>
-  )
+  );
 }
 
-export default ChatPage
+export default ChatPage;
