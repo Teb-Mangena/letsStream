@@ -13,8 +13,6 @@ import chatRoutes from "./routes/chat.route.js";
 const app = express();
 const { PORT, FRONTEND_URL } = ENV;
 
-console.log(FRONTEND_URL);
-
 // middlewares
 app.use(
   cors({

@@ -19,8 +19,6 @@ function App() {
   const isAuthenticated = Boolean(authUser);
   const isBoarded = authUser?.user?.isBoarded;
 
-  console.log(import.meta.env.MODE)
-
   if (isLoading) return <p>Loading...</p>
 
   return (
