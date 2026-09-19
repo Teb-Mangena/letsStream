@@ -1,10 +1,10 @@
 import { Link, useLocation } from "react-router";
-import { BellIcon, HomeIcon, ShipWheelIcon, UsersIcon } from "lucide-react";
+import { BellIcon, HomeIcon, ShipWheelIcon, UserIcon } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
 const NAV = [
   { to: "/", num: "01", label: "Home", icon: HomeIcon },
-  { to: "/friends", num: "02", label: "Friends", icon: UsersIcon },
+  { to: "/profile", num: "02", label: "Profile", icon: UserIcon },
   { to: "/notifications", num: "03", label: "Notifications", icon: BellIcon },
 ];
 
@@ -44,8 +44,8 @@ const Sidebar = () => {
                 <Link
                   to={to}
                   className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${active
-                      ? "bg-lime-300/[0.06] text-white"
-                      : "text-white/60 hover:text-white hover:bg-white/[0.03]"
+                    ? "bg-lime-300/[0.06] text-white"
+                    : "text-white/60 hover:text-white hover:bg-white/[0.03]"
                     }`}
                 >
                   {/* active bar */}
@@ -56,8 +56,8 @@ const Sidebar = () => {
 
                   <Icon
                     className={`size-[18px] shrink-0 transition-colors ${active
-                        ? "text-lime-300"
-                        : "text-white/40 group-hover:text-white/70"
+                      ? "text-lime-300"
+                      : "text-white/40 group-hover:text-white/70"
                       }`}
                   />
 
