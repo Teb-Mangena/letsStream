@@ -301,3 +301,27 @@
   background: rgba(217, 249, 157, 0.08) !important;
   color: #d9f99d !important;
 }
+
+/* ── Mobile composer fix ───────────────────── */
+@media (max-width: 1023px) {
+  /* Give the composer breathing room above the mobile bottom nav */
+  .str-chat__message-input {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Keep the list scrollable but let the composer anchor correctly */
+  .str-chat__main-panel {
+    min-height: 0;
+  }
+
+  .str-chat__list {
+    padding: 16px 12px !important;
+  }
+
+  /* Slightly smaller bubbles on small screens */
+  .str-chat__message-simple-text-inner,
+  .str-chat__message-text-inner {
+    font-size: 13px !important;
+    padding: 9px 12px !important;
+  }
+}

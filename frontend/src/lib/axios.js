@@ -10,6 +10,8 @@ if (isProduction) {
   apiURL = "http://localhost:5050";
 }
 
+export const callURL = apiURL;
+
 export const axiosInstance = create({
   baseURL: `${apiURL}/api`,
   withCredentials: true,
