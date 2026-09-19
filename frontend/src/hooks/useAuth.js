@@ -43,7 +43,21 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     retry: false,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+
+    onSuccess: () => {
+      queryClient.setQueryData(["authUser"], null);
+      queryClient.removeQueries({ queryKey: ["authUser"] });
+
+      toast.success("Logged out successfully");
+    },
+
+    onError: (error) => {
+      const message = isAxiosError(error)
+        ? (error.response?.data?.message ?? "Failed to logout")
+        : "Error logging out";
+
+      toast.error(message);
+    },
   });
 
   const onboardingMutation = useMutation({

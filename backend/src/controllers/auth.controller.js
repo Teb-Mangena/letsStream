@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import { generateToken } from "../config/generateToken.js";
 import { upsertStreamUser } from "../lib/stream.js";
+import { ENV } from "../config/env.js";
 
 export async function signup(req, res) {
   const { fullName, email, password } = req.body;
@@ -113,8 +114,15 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
   try {
-    res.clearCookie("token");
-    res.status(200).json({ message: "Logged out successfully" });
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
+      secure: ENV.NODE_ENV === "production",
+    });
+
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
   } catch (error) {
     console.log("Error in logout controller", error);
     res.status(500).json({ message: "Internal Server Error" });
