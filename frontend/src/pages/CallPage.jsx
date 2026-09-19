@@ -1,7 +1,10 @@
+import { useParams } from "react-router";
 
 function CallPage() {
+  const { id } = useParams();
+
   return (
-    <div>CallPage</div>
+    <div>CallPage - {id}</div>
   )
 }
 
