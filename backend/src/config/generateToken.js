@@ -8,8 +8,8 @@ export async function generateToken(id, res) {
 
   res.cookie("token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true, // prevent XSS attacks,
-    sameSite: "strict", // prevent CSRF attacks
+    httpOnly: true,
+    sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
     secure: ENV.NODE_ENV === "production",
   });
 }
